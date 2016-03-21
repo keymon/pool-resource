@@ -20,6 +20,7 @@ load_pubkey $payload
 uri=$(jq -r '.source.uri // ""' < $payload)
 branch=$(jq -r '.source.branch // ""' < $payload)
 pool_name=$(jq -r '.source.pool // ""' < $payload)
+gitconfig=$(jq -r '.source.config | map("--config '\''\(.)'\''") | join(" ")' < $payload)
 ref=$(jq -r '.version.ref // ""' < $payload)
 
 
@@ -52,7 +53,7 @@ else
     branchflag="--branch $branch"
   fi
 
-  git clone $uri $branchflag $destination
+  eval git clone $gitconfig $uri $branchflag $destination
   cd $destination
 fi
 

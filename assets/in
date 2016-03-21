@@ -37,6 +37,7 @@ load_pubkey $payload
 uri=$(jq -r '.source.uri // ""' < $payload)
 branch=$(jq -r '.source.branch // ""' < $payload)
 pool_name=$(jq -r '.source.pool // ""' < $payload)
+gitconfig=$(jq -r '.source.config | map("--config '\''\(.)'\''") | join(" ")' < $payload)
 ref=$(jq -r '.version.ref // "HEAD"' < $payload)
 
 if [ -z "$uri" ]; then
@@ -61,7 +62,7 @@ if [ -n "$branch" ]; then
   branchflag="--branch $branch"
 fi
 
-git clone $uri $branchflag $destination
+eval git clone $gitconfig $uri $branchflag $destination
 
 cd $destination
 
@@ -96,4 +97,4 @@ fi
 mkdir -p $1
 
 cat $pool_name/*/${changed_filename} > ${1}/metadata
-echo ${changed_filename} > ${1}/name
+\\echo ${changed_filename} > ${1}/name
