@@ -1,9 +1,14 @@
-FROM concourse/busyboxplus:git
+FROM alpine:3.3
+
+ENV AWSCLI_VERSION "1.9.21"
+ENV PACKAGES "git openssh-client groff less python py-pip curl openssl ca-certificates jq"
+
+RUN apk add --update $PACKAGES \
+    && pip install awscli==$AWSCLI_VERSION \
+    && apk --purge -v del py-pip \
+    && rm -rf /var/cache/apk/*
 
 ENV LANG C
-
-ADD http://stedolan.github.io/jq/download/linux64/jq /usr/local/bin/jq
-RUN chmod +x /usr/local/bin/jq
 
 ADD assets/ /opt/resource/
 RUN chmod +x /opt/resource/*
